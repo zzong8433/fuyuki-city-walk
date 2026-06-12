@@ -6,10 +6,10 @@
 <title>후유키 성배전쟁 — Fuyuki Grail War (prototype)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #05060c; touch-action: none; -webkit-user-select: none; user-select: none; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #05060c; -webkit-user-select: none; user-select: none; }
   body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif; color: #ede6f2; cursor: crosshair; }
   #app { position: fixed; inset: 0; }
-  canvas { display: block; }
+  canvas { display: block; touch-action: none; }
 
   #overlay { position: fixed; inset: 0; pointer-events: none; z-index: 4; overflow: hidden; }
   .bar { position: absolute; transform: translate(-50%, -50%); }
@@ -57,7 +57,7 @@
   #npwrap .lbl { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:9px; color:#fff; text-shadow:0 1px 2px #000; letter-spacing:1px; }
   @keyframes ultpulse { 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.5);} }
 
-  .screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(28,16,52,0.94), rgba(6,6,14,0.97)); text-align: center; cursor: default; padding: 20px; }
+  .screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(28,16,52,0.94), rgba(6,6,14,0.97)); text-align: center; cursor: default; padding: 24px 16px 100px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
   .screen.hidden { display: none; }
   .screen h1 { font-size: 44px; letter-spacing: 6px; font-weight: 800; text-shadow: 0 0 30px rgba(160,100,255,0.6); margin-bottom: 4px; }
   .screen h2 { font-size: 14px; letter-spacing: 4px; color: #b79bff; margin-bottom: 26px; font-weight: 400; }
@@ -73,11 +73,22 @@
   .swatch { display:inline-block; width:11px; height:11px; border-radius:50%; vertical-align:middle; margin-right:5px; }
   .btn { margin-top: 26px; padding: 13px 42px; font-size: 16px; font-weight: 700; letter-spacing: 3px; color: #1a1026; background: linear-gradient(180deg,#ffd27a,#ffae3b); border: none; border-radius: 10px; cursor: pointer; pointer-events: auto; box-shadow: 0 6px 20px rgba(255,170,60,0.35); }
   .btn:disabled { opacity: 0.4; cursor: default; }
+  /* 서번트 선택: 스크롤 가능 + 소환 버튼 하단 고정 */
+  #startscreen { justify-content: flex-start; }
+  #startbtn { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); margin-top: 0; z-index: 22; white-space: nowrap; padding: 13px 34px; box-shadow: 0 6px 24px rgba(0,0,0,0.6), 0 6px 20px rgba(255,170,60,0.4); }
+  @media (max-width: 600px) {
+    .screen h1 { font-size: 30px; letter-spacing: 3px; }
+    .screen h2 { font-size: 11px; margin-bottom: 14px; }
+    .cards { gap: 12px; }
+    .card { width: 90vw; max-width: 360px; padding: 13px 16px; }
+    .card .hn { font-size: 19px; margin: 2px 0 6px; }
+    .card .kit, .card .role { font-size: 11px; line-height: 1.5; }
+  }
   #result { font-size: 18px; color: #d8ccb6; margin-bottom: 8px; letter-spacing: 2px; }
   .place { color: #ffd27a; font-weight: 800; }
 
   /* touch */
-  #touch { position: fixed; inset: 0; z-index: 6; pointer-events: none; }
+  #touch { position: fixed; inset: 0; z-index: 6; pointer-events: none; touch-action: none; }
   #touch.hidden { display: none; }
   .stick { position: absolute; width: 118px; height: 118px; margin: -59px 0 0 -59px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.16); display: none; }
   .stick .knob { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.3); transform: translate(-50%,-50%); }
@@ -1106,6 +1117,7 @@ SVKEYS.forEach(k => {
   });
   cardsEl.appendChild(c);
 });
+cardsEl.firstElementChild?.click(); // 기본 세이버 선택 → 바로 소환 가능
 document.getElementById('startbtn').addEventListener('click', () => { if (document.getElementById('startbtn').disabled) return; document.getElementById('startscreen').classList.add('hidden'); startMatch(); });
 document.getElementById('againbtn').addEventListener('click', () => { document.getElementById('resultscreen').classList.add('hidden'); document.getElementById('startscreen').classList.remove('hidden'); });
 
